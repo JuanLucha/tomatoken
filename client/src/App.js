@@ -32,11 +32,17 @@ class App extends Component {
         this.deployedNetwork && this.deployedNetwork.address
       );
 
-      const tomatokensCount = await this.instance.methods.balanceOf(this.accounts[0], ItemKeys.Tomatokens).call();
+      this.updateBalance(this.accounts[0]);
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
-      this.setState({ tomatokensCount: tomatokensCount, loaded: true });
+      // Check blockchain account changed
+      if (window.ethereum) {
+        window.ethereum.on("accountsChanged", () => {
+          this.web3.eth.getAccounts((error, accounts) => {
+            this.setAccount(accounts[0]);
+          });
+        });
+      }
+      this.setState({ loaded: true });
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(`Failed to load web3, accounts, or contract. Check console for details.`);
@@ -44,6 +50,14 @@ class App extends Component {
     }
   };
 
+  setAccount = (account) => {
+    this.updateBalance(account);
+  };
+
+  updateBalance = async (account) => {
+    const tomatokensCount = await this.instance.methods.balanceOf(account, ItemKeys.Tomatokens).call();
+    this.setState({ tomatokensCount: tomatokensCount });
+  };
   render() {
     if (!this.state.loaded) {
       return <div>Loading Web3, accounts, and contract...</div>;
