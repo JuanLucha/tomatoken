@@ -14,8 +14,9 @@ class App extends Component {
   networkId;
   deployedNetwork;
   instance;
+  tomatokenPrice;
 
-  state = { tomatokensCount: 0, loaded: false };
+  state = { tomatokensCount: 0, loaded: false, amountToBuy: 0, priceToBuy: 0 };
 
   componentDidMount = async () => {
     try {
@@ -31,6 +32,7 @@ class App extends Component {
         TomatokenContract.abi,
         this.deployedNetwork && this.deployedNetwork.address
       );
+      this.tomatokenPrice = await this.instance.methods.TOMATOKEN_PRICE_IN_WEI().call();
 
       this.updateBalance(this.accounts[0]);
 
@@ -56,8 +58,30 @@ class App extends Component {
 
   updateBalance = async (account) => {
     const tomatokensCount = await this.instance.methods.balanceOf(account, ItemKeys.Tomatokens).call();
-    this.setState({ tomatokensCount: tomatokensCount });
+    this.setState({ tomatokensCount: tomatokensCount.toString() });
   };
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value,
+    });
+  };
+
+  handleAmountToBuy = (event) => {
+    this.handleInputChange(event);
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    this.setState({ priceToBuy: value * this.tomatokenPrice });
+  };
+
+  buyTomatokens = (event) => {
+    this.instance.methods.buyTokens().send({ from: this.accounts[0], value: this.state.priceToBuy });
+  };
+
   render() {
     if (!this.state.loaded) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -67,6 +91,15 @@ class App extends Component {
         <h1>Tomatoken</h1>
         <p>Tomatoken site</p>
         <div>Your have {this.state.tomatokensCount} tomatokens</div>
+        <h2>Buy Tomatokens!</h2>
+        Amount of 🍅 kens:{" "}
+        <input type="number" name="amountToBuy" onChange={this.handleAmountToBuy} value={this.state.amountToBuy} />
+        <br></br>
+        {this.state.priceToBuy > 0 && `Total price in wei: ${this.state.priceToBuy}`}
+        <br></br>
+        <button type="button" onClick={this.buyTomatokens}>
+          Buy 🍅 kens
+        </button>
       </div>
     );
   }
