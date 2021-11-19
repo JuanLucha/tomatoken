@@ -44,6 +44,7 @@ class App extends Component {
           });
         });
       }
+      this.instance.events.TomatokenBought().on("data", (data) => this.updateBalance(this.accounts[0]));
       this.setState({ loaded: true });
     } catch (error) {
       // Catch any errors for any of the above operations.
