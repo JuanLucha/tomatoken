@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import TomatokenContract from "./contracts/Tomatoken.json";
 import getWeb3 from "./getWeb3";
+
+import TomatokenContract from "./contracts/Tomatoken.json";
+import Pomodoro from "./pomodoro/Pomodoro";
 
 import "./App.css";
 
@@ -92,14 +94,23 @@ class App extends Component {
         <h1>Tomatoken</h1>
         <p>Tomatoken site</p>
         <div>Your have {this.state.tomatokensCount} tomatokens</div>
+        <Pomodoro></Pomodoro>
         <h2>Buy Tomatokens!</h2>
-        Amount of 🍅 kens:{" "}
+        Amount of{" "}
+        <span role="img" aria-label="pomodoro">
+          🍅
+        </span>
+        kens:{" "}
         <input type="number" name="amountToBuy" onChange={this.handleAmountToBuy} value={this.state.amountToBuy} />
         <br></br>
         {this.state.priceToBuy > 0 && `Total price in wei: ${this.state.priceToBuy}`}
         <br></br>
         <button type="button" onClick={this.buyTomatokens}>
-          Buy 🍅 kens
+          Buy{" "}
+          <span role="img" aria-label="pomodoro">
+            🍅
+          </span>
+          kens
         </button>
       </div>
     );
