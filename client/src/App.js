@@ -46,7 +46,9 @@ class App extends Component {
           });
         });
       }
+
       this.instance.events.TomatokenBought().on("data", (data) => this.updateBalance(this.accounts[0]));
+      this.instance.events.TomatokenRewarded().on("data", (data) => this.updateBalance(this.accounts[0]));
       this.setState({ loaded: true });
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -85,6 +87,10 @@ class App extends Component {
     this.instance.methods.buyTokens().send({ from: this.accounts[0], value: this.state.priceToBuy });
   };
 
+  onPomodoroOver = () => {
+    this.instance.methods.rewardTomatoken().send({ from: this.accounts[0] });
+  };
+
   render() {
     if (!this.state.loaded) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -94,7 +100,7 @@ class App extends Component {
         <h1>Tomatoken</h1>
         <p>Tomatoken site</p>
         <div>Your have {this.state.tomatokensCount} tomatokens</div>
-        <Pomodoro></Pomodoro>
+        <Pomodoro onPomodoroOver={this.onPomodoroOver}></Pomodoro>
         <h2>Buy Tomatokens!</h2>
         Amount of{" "}
         <span role="img" aria-label="pomodoro">
