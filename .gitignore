@@ -179,4 +179,6 @@ package-lock.json
 .history
 .ionide
 
+# output for ntf generator
+output/
 # End of https://www.toptal.com/developers/gitignore/api/soliditytruffle,visualstudiocode,react,node

@@ -1,10 +1,20 @@
 {
+  "name": "tomatoken",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pomodoros with reward",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
+    "minimist": "^1.2.5",
+    "web3.storage": "latest",
     "@openzeppelin/contracts": "^4.3.2",
     "@truffle/hdwallet-provider": "^1.6.0",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "chai-bn": "^0.3.0",
     "dotenv": "^10.0.0"
-  }
+  },
+  "author": "Juan Lucha"
 }
