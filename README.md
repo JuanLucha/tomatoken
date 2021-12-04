@@ -24,3 +24,7 @@ It will upload the files into IPFS and give you a CID.
 
 Each NFTomato image will be located in `https://[CID].ipfs.dweb.link/output/[0 based index of the NFTomato].png`
 Each NFTomato json metadata file will be located in `https://[CID].ipfs.dweb.link/output/metadata/[0 based index of the NFTomato]` (without the json extension)
+
+## Setting up the contract
+
+Once you have the CID of the metadata, you have to edit the constructor of the contract with the url `https://[CID].ipfs.dweb.link/metadata/{id}` (without the json extension) using the CID given in the last step. Leave the `{id}` part of the url as is.

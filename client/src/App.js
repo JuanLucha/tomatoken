@@ -7,7 +7,7 @@ import Pomodoro from "./pomodoro/Pomodoro";
 import "./App.css";
 
 const ItemKeys = {
-  Tomatokens: 0,
+  Tomatokens: 8,
 };
 
 class App extends Component {
@@ -18,7 +18,7 @@ class App extends Component {
   instance;
   tomatokenPrice;
 
-  state = { tomatokensCount: 0, loaded: false, amountToBuy: 0, priceToBuy: 0 };
+  state = { tomatokensCount: 0, loaded: false, amountToBuy: 0, priceToBuy: 0, NFTomatoes: []};
 
   componentDidMount = async () => {
     try {
@@ -35,6 +35,16 @@ class App extends Component {
         this.deployedNetwork && this.deployedNetwork.address
       );
       this.tomatokenPrice = await this.instance.methods.TOMATOKEN_PRICE_IN_WEI().call();
+      const nft = await this.instance.methods.getInventoryOf(this.instance.options.address).call();
+      const nftUrl = await this.instance.methods.uri(0).call();
+      if (nft)  Promise.all(nft.filter(tomato => parseInt(tomato.amount) === 1).map(async(tomato) => {
+        const tomatoUrl = nftUrl.replace(`{id}`, tomato.assetId)
+        const tomatoData = await (await fetch(tomatoUrl)).json()
+        return {id: tomato.assetId, name: tomatoData.name, image: tomatoData.image, attributes: tomatoData.attributes}
+      }))
+      .then((result) => {
+        this.setState({NFTomatoes: result})
+        })
 
       this.updateBalance(this.accounts[0]);
 
@@ -48,6 +58,7 @@ class App extends Component {
       }
 
       this.instance.events.TomatokenBought().on("data", (data) => this.updateBalance(this.accounts[0]));
+      this.instance.events.NFTomatoBought().on("data", (data) => console.log("tomato bought", data));
       this.instance.events.TomatokenRewarded().on("data", (data) => this.updateBalance(this.accounts[0]));
       this.setState({ loaded: true });
     } catch (error) {
@@ -83,7 +94,11 @@ class App extends Component {
     this.setState({ priceToBuy: value * this.tomatokenPrice });
   };
 
-  buyTomatokens = (event) => {
+  handleNFTomato = (tomatoId) => {
+    this.instance.methods.buyNFTomato(tomatoId).send({from: this.accounts[0], value: this.web3.utils.toWei('1', 'ether')})
+  };
+
+  buyTomatokens = () => {
     this.instance.methods.buyTokens().send({ from: this.accounts[0], value: this.state.priceToBuy });
   };
 
@@ -118,6 +133,11 @@ class App extends Component {
           </span>
           kens
         </button>
+        <h2>Buy NFTomatoes! (only 1 ETH each!)</h2>
+        {this.state.NFTomatoes && this.state.NFTomatoes.map(tomato => <div key={tomato.id} onClick={() => this.handleNFTomato(tomato.id)}>
+          <img src={tomato.image} />
+          <div>{tomato.name}</div>
+        </div>)}
       </div>
     );
   }

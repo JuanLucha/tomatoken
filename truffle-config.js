@@ -16,6 +16,7 @@ module.exports = {
   networks: {
     develop: {
       port: 8545,
+      gas: 10000000,
     },
     ganache: {
       provider: () => provider,
