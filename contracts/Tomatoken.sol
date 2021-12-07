@@ -11,7 +11,7 @@ contract Tomatoken is ERC1155 {
 
 	uint public constant TOMATOKENS = 80;
 	uint public constant TOMATOKEN_PRICE_IN_WEI = 10**12;
-	uint public constant TOMATOKEN_REWARD = 0;
+	uint public constant TOMATOKEN_REWARD = 1;
 	uint constant NFTomatoes = 80;
 	// mapping(uint256 => mapping(address => uint256)) private _balances;
 	mapping(address => Asset[]) private NFTownership;
@@ -60,7 +60,7 @@ contract Tomatoken is ERC1155 {
 
 	function rewardTomatoken() public {
 		require(balanceOf(address(this), TOMATOKENS) > 0, "There is no more Tomatoken to reward");
-		_safeTransferFrom(address(this), msg.sender, TOMATOKEN_REWARD, 1, "");
+		_safeTransferFrom(address(this), msg.sender, TOMATOKENS, TOMATOKEN_REWARD, "");
 		emit TomatokenRewarded(msg.sender, TOMATOKEN_REWARD);
 	}
 

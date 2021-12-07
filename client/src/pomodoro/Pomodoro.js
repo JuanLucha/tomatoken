@@ -15,6 +15,8 @@ const Pomodoro = ({ onPomodoroOver }) => {
         interval = setTimeout(() => setTime((previous) => previous + 1), 1000);
       } else {
         clearTimeout(interval);
+        setOngoing(false);
+        setTime(0);
         onPomodoroOver();
       }
     }

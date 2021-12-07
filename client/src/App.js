@@ -7,7 +7,7 @@ import Pomodoro from "./pomodoro/Pomodoro";
 import "./App.css";
 
 const ItemKeys = {
-  Tomatokens: 8,
+  Tomatokens: 80,
 };
 
 class App extends Component {
