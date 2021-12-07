@@ -18,7 +18,7 @@ class App extends Component {
   instance;
   tomatokenPrice;
 
-  state = { tomatokensCount: 0, loaded: false, amountToBuy: 0, priceToBuy: 0, NFTomatoes: []};
+  state = { tomatokensCount: 0, loaded: false, amountToBuy: 0, priceToBuy: 0, NFTomatoes: [], userTomatoes: [] };
 
   componentDidMount = async () => {
     try {
@@ -35,17 +35,8 @@ class App extends Component {
         this.deployedNetwork && this.deployedNetwork.address
       );
       this.tomatokenPrice = await this.instance.methods.TOMATOKEN_PRICE_IN_WEI().call();
-      const nft = await this.instance.methods.getInventoryOf(this.instance.options.address).call();
-      const nftUrl = await this.instance.methods.uri(0).call();
-      if (nft)  Promise.all(nft.filter(tomato => parseInt(tomato.amount) === 1).map(async(tomato) => {
-        const tomatoUrl = nftUrl.replace(`{id}`, tomato.assetId)
-        const tomatoData = await (await fetch(tomatoUrl)).json()
-        return {id: tomato.assetId, name: tomatoData.name, image: tomatoData.image, attributes: tomatoData.attributes}
-      }))
-      .then((result) => {
-        this.setState({NFTomatoes: result})
-        })
-
+      this.loadUserInventory();
+      this.loadStore();
       this.updateBalance(this.accounts[0]);
 
       // Check blockchain account changed
@@ -57,9 +48,14 @@ class App extends Component {
         });
       }
 
+      // Setting up the events
       this.instance.events.TomatokenBought().on("data", (data) => this.updateBalance(this.accounts[0]));
-      this.instance.events.NFTomatoBought().on("data", (data) => console.log("tomato bought", data));
+      this.instance.events.NFTomatoBought().on("data", (data) => {
+        this.loadUserInventory();
+        this.loadStore();
+      });
       this.instance.events.TomatokenRewarded().on("data", (data) => this.updateBalance(this.accounts[0]));
+
       this.setState({ loaded: true });
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -95,7 +91,9 @@ class App extends Component {
   };
 
   handleNFTomato = (tomatoId) => {
-    this.instance.methods.buyNFTomato(tomatoId).send({from: this.accounts[0], value: this.web3.utils.toWei('1', 'ether')})
+    this.instance.methods
+      .buyNFTomato(tomatoId)
+      .send({ from: this.accounts[0], value: this.web3.utils.toWei("1", "ether") });
   };
 
   buyTomatokens = () => {
@@ -104,6 +102,41 @@ class App extends Component {
 
   onPomodoroOver = () => {
     this.instance.methods.rewardTomatoken().send({ from: this.accounts[0] });
+  };
+
+  processNFTomatoes = async (tomatoes) => {
+    const nftUrl = await this.instance.methods.uri(0).call();
+
+    return Promise.all(
+      tomatoes
+        .filter((tomato) => parseInt(tomato.amount) === 1)
+        .map(async (tomato) => {
+          const tomatoUrl = nftUrl.replace(`{id}`, tomato.assetId);
+          const tomatoData = await (await fetch(tomatoUrl)).json();
+          return {
+            id: tomato.assetId,
+            name: tomatoData.name,
+            image: tomatoData.image,
+            attributes: tomatoData.attributes,
+          };
+        })
+    );
+  };
+
+  loadUserInventory = async () => {
+    const nft = await this.instance.methods.getInventoryOf(this.accounts[0]).call();
+    if (nft) {
+      const result = await this.processNFTomatoes(nft);
+      this.setState({ userTomatoes: result });
+    }
+  };
+
+  loadStore = async () => {
+    const nft = await this.instance.methods.getInventoryOf(this.instance.options.address).call();
+    if (nft) {
+      const result = await this.processNFTomatoes(nft);
+      this.setState({ NFTomatoes: result });
+    }
   };
 
   render() {
@@ -116,6 +149,15 @@ class App extends Component {
         <p>Tomatoken site</p>
         <div>Your have {this.state.tomatokensCount} tomatokens</div>
         <Pomodoro onPomodoroOver={this.onPomodoroOver}></Pomodoro>
+        {!this.state.userTomatoes && <div>You don't have any NFTomato yet</div>}
+        {this.state.userTomatoes && <div>Your NFTomatoes are: </div>}
+        {this.state.userTomatoes &&
+          this.state.userTomatoes.map((tomato) => (
+            <div key={tomato.id}>
+              <img src={tomato.image} />
+              <div>{tomato.name}</div>
+            </div>
+          ))}
         <h2>Buy Tomatokens!</h2>
         Amount of{" "}
         <span role="img" aria-label="pomodoro">
@@ -134,10 +176,13 @@ class App extends Component {
           kens
         </button>
         <h2>Buy NFTomatoes! (only 1 ETH each!)</h2>
-        {this.state.NFTomatoes && this.state.NFTomatoes.map(tomato => <div key={tomato.id} onClick={() => this.handleNFTomato(tomato.id)}>
-          <img src={tomato.image} />
-          <div>{tomato.name}</div>
-        </div>)}
+        {this.state.NFTomatoes &&
+          this.state.NFTomatoes.map((tomato) => (
+            <div key={tomato.id} onClick={() => this.handleNFTomato(tomato.id)}>
+              <img src={tomato.image} />
+              <div>{tomato.name}</div>
+            </div>
+          ))}
       </div>
     );
   }
