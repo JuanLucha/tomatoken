@@ -24,6 +24,7 @@ class App extends Component {
     try {
       // Get network provider and instance.
       this.web3 = await getWeb3();
+
       // Use web3 to get the user's accounts.
       this.accounts = await this.web3.eth.getAccounts();
 
@@ -35,6 +36,8 @@ class App extends Component {
         this.deployedNetwork && this.deployedNetwork.address
       );
       this.tomatokenPrice = await this.instance.methods.TOMATOKEN_PRICE_IN_WEI().call();
+
+      // Load inventories
       this.loadUserInventory();
       this.loadStore();
       this.updateBalance(this.accounts[0]);
@@ -139,6 +142,16 @@ class App extends Component {
     }
   };
 
+  renderTomatoes = (tomatoes = [], buyButton = false) => {
+    return tomatoes.map((tomato) => (
+      <div className="tomato" key={tomato.id}>
+        <img src={tomato.image} />
+        <div>{tomato.name}</div>
+        {buyButton && <button onClick={() => this.handleNFTomato(tomato.id)}>buy</button>}
+      </div>
+    ));
+  };
+
   render() {
     if (!this.state.loaded) {
       return <div>Loading Web3, accounts, and contract...</div>;
@@ -151,15 +164,7 @@ class App extends Component {
         <Pomodoro onPomodoroOver={this.onPomodoroOver}></Pomodoro>
         {!this.state.userTomatoes && <div>You don't have any NFTomato yet</div>}
         {this.state.userTomatoes && <div>Your NFTomatoes are: </div>}
-        <div className="tomato-list">
-          {this.state.userTomatoes &&
-            this.state.userTomatoes.map((tomato) => (
-              <div className="tomato" key={tomato.id}>
-                <img src={tomato.image} />
-                <div>{tomato.name}</div>
-              </div>
-            ))}
-        </div>
+        <div className="tomato-list">{this.state.userTomatoes && this.renderTomatoes(this.state.userTomatoes)}</div>
         <h2>Buy Tomatokens!</h2>
         Amount of{" "}
         <span role="img" aria-label="pomodoro">
@@ -178,15 +183,7 @@ class App extends Component {
           kens
         </button>
         <h2>Buy NFTomatoes! (only 1 ETH each!)</h2>
-        <div className="tomato-list">
-          {this.state.NFTomatoes &&
-            this.state.NFTomatoes.map((tomato) => (
-              <div className="tomato" key={tomato.id} onClick={() => this.handleNFTomato(tomato.id)}>
-                <img src={tomato.image} />
-                <div>{tomato.name}</div>
-              </div>
-            ))}
-        </div>
+        <div className="tomato-list">{this.state.NFTomatoes && this.renderTomatoes(this.state.NFTomatoes, true)}</div>
       </div>
     );
   }
