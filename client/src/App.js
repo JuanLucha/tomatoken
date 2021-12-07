@@ -144,20 +144,22 @@ class App extends Component {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
-      <div className="App">
+      <div className="app">
         <h1>Tomatoken</h1>
         <p>Tomatoken site</p>
         <div>Your have {this.state.tomatokensCount} tomatokens</div>
         <Pomodoro onPomodoroOver={this.onPomodoroOver}></Pomodoro>
         {!this.state.userTomatoes && <div>You don't have any NFTomato yet</div>}
         {this.state.userTomatoes && <div>Your NFTomatoes are: </div>}
-        {this.state.userTomatoes &&
-          this.state.userTomatoes.map((tomato) => (
-            <div key={tomato.id}>
-              <img src={tomato.image} />
-              <div>{tomato.name}</div>
-            </div>
-          ))}
+        <div className="tomato-list">
+          {this.state.userTomatoes &&
+            this.state.userTomatoes.map((tomato) => (
+              <div className="tomato" key={tomato.id}>
+                <img src={tomato.image} />
+                <div>{tomato.name}</div>
+              </div>
+            ))}
+        </div>
         <h2>Buy Tomatokens!</h2>
         Amount of{" "}
         <span role="img" aria-label="pomodoro">
@@ -176,13 +178,15 @@ class App extends Component {
           kens
         </button>
         <h2>Buy NFTomatoes! (only 1 ETH each!)</h2>
-        {this.state.NFTomatoes &&
-          this.state.NFTomatoes.map((tomato) => (
-            <div key={tomato.id} onClick={() => this.handleNFTomato(tomato.id)}>
-              <img src={tomato.image} />
-              <div>{tomato.name}</div>
-            </div>
-          ))}
+        <div className="tomato-list">
+          {this.state.NFTomatoes &&
+            this.state.NFTomatoes.map((tomato) => (
+              <div className="tomato" key={tomato.id} onClick={() => this.handleNFTomato(tomato.id)}>
+                <img src={tomato.image} />
+                <div>{tomato.name}</div>
+              </div>
+            ))}
+        </div>
       </div>
     );
   }

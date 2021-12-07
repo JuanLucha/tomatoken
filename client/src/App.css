@@ -1,12 +1,12 @@
-.App {
+.app {
   text-align: center;
 }
 
-.App-logo {
+.app-logo {
   height: 40vmin;
 }
 
-.App-header {
+.app-header {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
@@ -17,10 +17,20 @@
   color: white;
 }
 
-.App-link {
+.app-link {
   color: #09d3ac;
 }
 
 img {
   max-width: 100px;
+}
+
+.tomato-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tomato {
+  margin: 5px;
 }
