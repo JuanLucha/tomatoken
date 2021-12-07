@@ -18,7 +18,15 @@ class App extends Component {
   instance;
   tomatokenPrice;
 
-  state = { tomatokensCount: 0, loaded: false, amountToBuy: 0, priceToBuy: 0, NFTomatoes: [], userTomatoes: [] };
+  state = {
+    tomatokensCount: 0,
+    loaded: false,
+    amountToBuy: 0,
+    priceToBuy: 0,
+    NFTomatoes: [],
+    userTomatoes: [],
+    isInitialized: false,
+  };
 
   componentDidMount = async () => {
     try {
@@ -27,6 +35,30 @@ class App extends Component {
 
       // Use web3 to get the user's accounts.
       this.accounts = await this.web3.eth.getAccounts();
+
+      this.initializeDapp();
+
+      this.setState({ loaded: true });
+    } catch (error) {
+      // Catch any errors for any of the above operations.
+      alert(`Failed to load web3, accounts, or contract. Check console for details.`);
+      console.error(error);
+    }
+  };
+
+  initializeDapp = async () => {
+    try {
+      // Check blockchain account changed
+      if (window.ethereum) {
+        window.ethereum.on("chainChanged", async () => {
+          if (!this.state.isInitialized) await this.initializeDapp();
+        });
+        window.ethereum.on("accountsChanged", async () => {
+          this.web3.eth.getAccounts((error, accounts) => {
+            this.setAccount(accounts[0]);
+          });
+        });
+      }
 
       // Get the contract instance.
       this.networkId = await this.web3.eth.net.getId();
@@ -42,15 +74,6 @@ class App extends Component {
       this.loadStore();
       this.updateBalance(this.accounts[0]);
 
-      // Check blockchain account changed
-      if (window.ethereum) {
-        window.ethereum.on("accountsChanged", () => {
-          this.web3.eth.getAccounts((error, accounts) => {
-            this.setAccount(accounts[0]);
-          });
-        });
-      }
-
       // Setting up the events
       this.instance.events.TomatokenBought().on("data", (data) => this.updateBalance(this.accounts[0]));
       this.instance.events.NFTomatoBought().on("data", (data) => {
@@ -58,13 +81,8 @@ class App extends Component {
         this.loadStore();
       });
       this.instance.events.TomatokenRewarded().on("data", (data) => this.updateBalance(this.accounts[0]));
-
-      this.setState({ loaded: true });
-    } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(`Failed to load web3, accounts, or contract. Check console for details.`);
-      console.error(error);
-    }
+      this.setState({ isInitialized: true });
+    } catch (error) {}
   };
 
   setAccount = (account) => {
@@ -159,31 +177,38 @@ class App extends Component {
     return (
       <div className="app">
         <h1>Tomatoken</h1>
-        <p>Tomatoken site</p>
-        <div>Your have {this.state.tomatokensCount} tomatokens</div>
-        <Pomodoro onPomodoroOver={this.onPomodoroOver}></Pomodoro>
-        {!this.state.userTomatoes && <div>You don't have any NFTomato yet</div>}
-        {this.state.userTomatoes && <div>Your NFTomatoes are: </div>}
-        <div className="tomato-list">{this.state.userTomatoes && this.renderTomatoes(this.state.userTomatoes)}</div>
-        <h2>Buy Tomatokens!</h2>
-        Amount of{" "}
-        <span role="img" aria-label="pomodoro">
-          🍅
-        </span>
-        kens:{" "}
-        <input type="number" name="amountToBuy" onChange={this.handleAmountToBuy} value={this.state.amountToBuy} />
-        <br></br>
-        {this.state.priceToBuy > 0 && `Total price in wei: ${this.state.priceToBuy}`}
-        <br></br>
-        <button type="button" onClick={this.buyTomatokens}>
-          Buy{" "}
-          <span role="img" aria-label="pomodoro">
-            🍅
-          </span>
-          kens
-        </button>
-        <h2>Buy NFTomatoes! (only 1 ETH each!)</h2>
-        <div className="tomato-list">{this.state.NFTomatoes && this.renderTomatoes(this.state.NFTomatoes, true)}</div>
+        {!this.state.isInitialized && <div>Please, connect to the correct network in Metamask</div>}
+        {this.state.isInitialized && (
+          <div>
+            <p>Tomatoken site</p>
+            <div>Your have {this.state.tomatokensCount} tomatokens</div>
+            <Pomodoro onPomodoroOver={this.onPomodoroOver}></Pomodoro>
+            {!this.state.userTomatoes && <div>You don't have any NFTomato yet</div>}
+            {this.state.userTomatoes && <div>Your NFTomatoes are: </div>}
+            <div className="tomato-list">{this.state.userTomatoes && this.renderTomatoes(this.state.userTomatoes)}</div>
+            <h2>Buy Tomatokens!</h2>
+            Amount of{" "}
+            <span role="img" aria-label="pomodoro">
+              🍅
+            </span>
+            kens:{" "}
+            <input type="number" name="amountToBuy" onChange={this.handleAmountToBuy} value={this.state.amountToBuy} />
+            <br></br>
+            {this.state.priceToBuy > 0 && `Total price in wei: ${this.state.priceToBuy}`}
+            <br></br>
+            <button type="button" onClick={this.buyTomatokens}>
+              Buy{" "}
+              <span role="img" aria-label="pomodoro">
+                🍅
+              </span>
+              kens
+            </button>
+            <h2>Buy NFTomatoes! (only 1 ETH each!)</h2>
+            <div className="tomato-list">
+              {this.state.NFTomatoes && this.renderTomatoes(this.state.NFTomatoes, true)}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
