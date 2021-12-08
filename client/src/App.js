@@ -2,9 +2,12 @@ import React, { Component } from "react";
 import getWeb3 from "./getWeb3";
 
 import TomatokenContract from "./contracts/Tomatoken.json";
-import Pomodoro from "./pomodoro/Pomodoro";
+import Store from "./Store";
+import Menu from "./Menu";
+import Dashboard from "./Dashboard";
 
 import "./App.css";
+import Screens from "./screens";
 
 const ItemKeys = {
   Tomatokens: 80,
@@ -26,6 +29,7 @@ class App extends Component {
     NFTomatoes: [],
     userTomatoes: [],
     isInitialized: false,
+    screen: Screens.Dashboard,
   };
 
   componentDidMount = async () => {
@@ -170,45 +174,41 @@ class App extends Component {
     ));
   };
 
+  setScreen = (screen) => {
+    this.setState({ screen: screen });
+  };
+
   render() {
     if (!this.state.loaded) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
       <div className="app">
-        <h1>Tomatoken</h1>
-        {!this.state.isInitialized && <div>Please, connect to the correct network in Metamask</div>}
-        {this.state.isInitialized && (
-          <div>
-            <p>Tomatoken site</p>
-            <div>Your have {this.state.tomatokensCount} tomatokens</div>
-            <Pomodoro onPomodoroOver={this.onPomodoroOver}></Pomodoro>
-            {!this.state.userTomatoes && <div>You don't have any NFTomato yet</div>}
-            {this.state.userTomatoes && <div>Your NFTomatoes are: </div>}
-            <div className="tomato-list">{this.state.userTomatoes && this.renderTomatoes(this.state.userTomatoes)}</div>
-            <h2>Buy Tomatokens!</h2>
-            Amount of{" "}
-            <span role="img" aria-label="pomodoro">
-              🍅
-            </span>
-            kens:{" "}
-            <input type="number" name="amountToBuy" onChange={this.handleAmountToBuy} value={this.state.amountToBuy} />
-            <br></br>
-            {this.state.priceToBuy > 0 && `Total price in wei: ${this.state.priceToBuy}`}
-            <br></br>
-            <button type="button" onClick={this.buyTomatokens}>
-              Buy{" "}
-              <span role="img" aria-label="pomodoro">
-                🍅
-              </span>
-              kens
-            </button>
-            <h2>Buy NFTomatoes! (only 1 ETH each!)</h2>
-            <div className="tomato-list">
-              {this.state.NFTomatoes && this.renderTomatoes(this.state.NFTomatoes, true)}
+        <div className="tomato-head"></div>
+        <div className="tomato-container">
+          <h1>Tomatoken</h1>
+          {!this.state.isInitialized && <div>Please, connect to the correct network in Metamask</div>}
+          {this.state.isInitialized && (
+            <div>
+              <Menu setScreen={this.setScreen}></Menu>
+              {this.state.screen === Screens.Dashboard && (
+                <Dashboard
+                  tomatokens={this.state.tomatokensCount}
+                  onPomodoroOver={this.onPomodoroOver}
+                  userTomatoes={this.state.userTomatoes}
+                  renderTomatoes={this.renderTomatoes}
+                  handleAmountToBuy={this.handleAmountToBuy}
+                  amountToBuy={this.state.amountToBuy}
+                  priceToBuy={this.state.priceToBuy}
+                  buyTomatokens={this.buyTomatokens}
+                ></Dashboard>
+              )}
+              {this.state.screen === Screens.Store && (
+                <Store NFTomatoes={this.state.NFTomatoes} renderTomatoes={this.renderTomatoes}></Store>
+              )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   }

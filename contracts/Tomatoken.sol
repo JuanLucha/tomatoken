@@ -13,7 +13,6 @@ contract Tomatoken is ERC1155 {
 	uint public constant TOMATOKEN_PRICE_IN_WEI = 10**12;
 	uint public constant TOMATOKEN_REWARD = 1;
 	uint constant NFTomatoes = 80;
-	// mapping(uint256 => mapping(address => uint256)) private _balances;
 	mapping(address => Asset[]) private NFTownership;
 
 	event TomatokenBought(address indexed buyer, uint amount);

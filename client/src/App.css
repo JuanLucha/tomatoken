@@ -1,5 +1,30 @@
 .app {
   text-align: center;
+  height: 98vh;
+  overflow: hidden;
+}
+
+h1,
+h2 {
+  color: #b70303;
+}
+
+.tomato-head {
+  border-radius: 25px;
+  width: 100px;
+  height: 30px;
+  border: 5px solid green;
+  background-color: palegreen;
+  margin: 20px 0 0 200px;
+}
+
+.tomato-container {
+  border: 5px solid brown;
+  margin: 0 30px 30px 30px;
+  border-radius: 25px;
+  background-color: pink;
+  height: 88vh;
+  overflow: auto;
 }
 
 .app-logo {
@@ -32,5 +57,39 @@ img {
 }
 
 .tomato {
-  margin: 5px;
+  margin: 5px 5px 10px 5px;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid #b70303;
+  width: 80%;
+  margin: auto;
+  margin-bottom: 30px;
+}
+
+.menu-option {
+  color: #b70303;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.menu-option:hover {
+  font-weight: bold;
+}
+
+.price-to-buy {
+  margin-top: 5px;
+}
+
+.pomodoro {
+  width: 200px;
+  height: 70px;
+  border-radius: 20px;
+  background-color: papayawhip;
+  border: 3px solid brown;
+  margin: 20px auto;
+  padding: 5px;
+  padding-top: 10px;
 }

@@ -28,7 +28,7 @@ const Pomodoro = ({ onPomodoroOver }) => {
   };
 
   return (
-    <div>
+    <div className="pomodoro">
       {ongoing && <Display time={time}></Display>}
       <br></br>
       <button onClick={startPomodoro}>
