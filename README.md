@@ -7,6 +7,7 @@ This is a very complete example of several blockchain technologies applications.
 The application is divided in 2 screens: **Dashboard** and **Store**
 
 **Dashboard**
+
 The dashboard in the main screen. There you can see the ammount of Tomatokens you have (1), the pomodoro timer (2), the NFTomatoes you have (3), and the Tomatoken buy functionality (4).
 
 ![](2021-12-08-14-01-43.png)
@@ -18,7 +19,10 @@ After the pomodoro is finished, the user will be prompted with Metamask asking t
 When the user inputs an amount of tomatokens to buy, the amount of wei it will cost will appear autocalculated in the screen. After clicking the buy button, Metamask will ask for confirmation of the transaction.
 
 **Store**
+
 The store is where the NFTomatoes are bought. You can buy the NFTomatoes at a fixed price of 1 ETH (plus gas fees). Clicking on one of the multiple "buy" buttons will make Metamask to popup asking for the confirmation of the transaction. After the confirmation is done, that NFTomato will disappear from the Store and will appear in the "Your NFTomatoes" section in the Dashboard (number 3 in the image).
+
+![](2021-12-08-14-13-06.png)
 
 # The Technical Stuff
 
